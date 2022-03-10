@@ -1,0 +1,353 @@
+## Java Details
+- ### maven
+    - local central remote
+    - lifecycle
+        - validate: validate the project is correct and all necessary information is available
+        - compile: compile the source code of the project
+        - test: test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
+        - package: take the compiled code and package it in its distributable format, such as a JAR.
+        - verify: run any checks on results of integration tests to ensure quality criteria are met
+        - install: install the package into the local repository, for use as a dependency in other projects locally
+        - deploy: done in the build environment, copies the final package to the remote repository for sharing with other developers and projects.
+- ### primitive type
+    - Primitive data are only single values and have no special capabilities
+    - double, byte, boolean, int, char, short, long, float
+- ### wrapper class
+    - A Wrapper class is a class whose object wraps or contains primitive data types. 
+- ### String/ StringBuilder |which seceniro
+- ### String/Integer constant pool |  when will be stored
+    - JVM maintains a String pool which stores all the String literals(char[]). The literals in String Pool can be reused. So when we declear a String object using quotes( s = "Hi"), it will reuse the "Hi" in the pool if it already exists. 
+- ### equals/hashcode | why we need to override same 
+    - prevent your class from functioning properly in conjunction with all hash-based collections.
+    - objects that are equal to each other must return the same hashCode
+    - If only equals is overriden, then when you call myMap.put(new String(“s”),someValue) first will hash to some bucket and when you call myMap.put(new String(“s”),someOtherValue) it will hash to some other bucket
+    - But the problem is that equals was not redefined, so when the map hashes second and iterates through the bucket looking if there is an object k such that second.equals(k) is true it won't find any as second.equals(first) will be false.
+- ### Collection
+    - List, Set, Queue, Map
+    ![collection](https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210315172345/Java-Collections-Framework-Hierarchy.png)
+    - list set | difference
+        - keep insertion order, unorderd
+        - duplicate object
+    - arraylist vs linkedlist
+        - dynamic array| doubly linked list
+        - store, access data| manipulate
+        - list | list & deque
+    - TreeSet | what to do, give the order(using comparator| compatrable)
+        - The reason is that in a self-balancing tree, it is made sure that the height of the tree is always O(log(N)) for all the operations.
+    - HashMap vs HashTable vs ConcurrentHashMap
+        - bucket of node, >8 entries linked list -> balanced tree, (chaining, open addressing(linear probing, double hashing)), allow one null
+        - object level lock
+        - bucket level lock, read can be performed without lock, allows 16 thread
+    - HashSet, TreeSet, LinkedHashSet
+    - TreeMap, LinkedHashMap
+    - Stack, Queue
+    -  LinkedHashMap(LRUfirst, element)
+    -  array | int 1d 2d
+        -  Arrays are used to store multiple values in a single variable, instead of declaring separate variables for each value.
+    -  binary tree, balanced binary tree
+        -   a binary tree is a tree data structure in which each node has at most two children
+        -   a binary tree structure in which the left and right subtrees of every node differ in height by no more than 1.
+- ### Comparator | which case use comparator(third party) 
+    - Comparable internal order of the class
+- ### JVM
+    - **classloader**
+        - bootstrap extension application
+            - System class loader delegate load request to extension class loader and extension class loader delegate request to the bootstrap class loader. If a class found in the boot-strap path, the class is loaded otherwise request again transfers to the extension class loader and then to the system class loader. At last, if the system class loader fails to load class, then we get run-time exception java.lang.ClassNotFoundException. 
+        
+        - phase loading linking initialziation|  what flow (recursively)
+            - loading: The Class loader reads the “.class” file, generate the corresponding binary data and save it in the method area. For each “.class” file, JVM stores the following information in the method area. 
+                - The fully qualified name of the loaded class and its immediate parent class.
+                - Whether the “.class” file is related to Class or Interface or Enum.
+                - Modifier, Variables and Method information etc.
+            - linking
+                - <u>Verification:</u> It ensures the correctness of the .class file i.e. it checks whether this file is properly formatted and generated by a valid compiler or not. If verification fails, we get run-time exception java.lang.VerifyError.
+                - <u>Preparation:</u> JVM allocates memory for class variables and initializing the memory to default values.
+                - <u>Resolution:</u> It is the process of replacing symbolic references from the type with direct references.
+            - <u>initialization</u>: In this phase, all static variables are assigned with their values defined in the code and static block(if any)
+    - **runtime data area**
+        - method, stack, heap , PC, native 
+            - Method area: In the method area, all class level information like class name, immediate parent class name, methods and variables information etc. are stored, including static variables. There is only one method area per JVM, and it is a shared resource.
+            - Heap area: Information of all objects is stored in the heap area. 
+            - Stack area: For every thread, JVM creates one run-time stack which is stored here. Every block of this stack is called activation record/stack frame which stores methods calls. All local variables of that method are stored in their corresponding frame. After a thread terminates, its run-time stack will be destroyed by JVM. It is not a shared resource.
+            - PC Registers: Store address of current execution instruction of a thread. Obviously, each thread has separate PC Registers.
+            - Native method stacks: For every thread, a separate native stack is created. It stores native method information. 
+    - **excution engine**
+        - interpreter JIT gabage collector
+            - Interpreter: It interprets the bytecode line by line and then executes. The disadvantage here is that when one method is called multiple times, every time interpretation is required.
+            - Just-In-Time Compiler(JIT) : It is used to increase the efficiency of an interpreter. It compiles the entire bytecode and changes it to native code so whenever the interpreter sees repeated method calls, JIT provides direct native code for that part so re-interpretation is not required, thus efficiency is improved.
+            - Garbage Collector: It destroys un-referenced objects. 
+    - **Java Native Interface (JNI)** : It is an interface that interacts with the Native Method Libraries and provides the native libraries(C, C++) required for the execution. 
+    - **Native Method Libraries** : It is a collection of the Native Libraries(C, C++) which are required by the Execution Engine.
+    - **GC**
+        - serial parallel G1
+            - The serial collector uses a single thread to perform all garbage collection work, which makes it relatively efficient because there is no communication overhead between threads.
+            - CMS delicated java9 removed java14
+            - The Permanent generation contains metadata required by the JVM to describe the classes and methods used in the application. The permanent generation is populated by the JVM at runtime based on classes in use by the application. In addition, Java SE library classes and methods may be stored here. From Java 8, Permanent generation is replaced with MetaSpace
+            - G1 garbage collector: This server-style collector is for multiprocessor machines with a large amount of memory. It meets garbage collection pause-time goals with high probability, while achieving high throughput. Unlike other collectors, the G1 collector partitions the heap into a set of equal-sized heap regions,When performing garbage collections, G1 shows a concurrent global marking phase (i.e. phase 1 known as Marking) to determine the liveness of objects throughout the heap.
+        - process 
+            - process
+                - First, any new objects are allocated to the eden space. Both survivor spaces start out empty.
+                - When the eden space fills up, a minor garbage collection is triggered.
+                - Referenced objects are moved to the first survivor space. Unreferenced objects are deleted when the eden space is cleared.
+                - At the next minor GC, the same thing happens for the eden space. Unreferenced objects are deleted and referenced objects are moved to a survivor space. However, in this case, they are moved to the second survivor space (S1). In addition, objects from the last minor GC on the first survivor space (S0) have their age incremented and get moved to S1. Once all surviving objects have been moved to S1, both S0 and eden are cleared. Notice we now have differently aged object in the survivor space.
+                - At the next minor GC, the same process repeats. However this time the survivor spaces switch. Referenced objects are moved to S0. Surviving objects are aged. Eden and S1 are cleared.
+                - After a minor GC, when aged objects reach a certain age threshold (8 in this example) they are promoted from young generation to old generation.
+                - Eventually, a major GC will be performed on the old generation which cleans up and compacts that space.
+            - start from root
+                - Java GC uses Mark and Sweep strategy to clean the heap.
+                    - Mark – it is where the garbage collector identifies which pieces of memory are in use and which are not
+                    - Sweep – this step removes objects identified during the “mark” phase
+            - young/ old/ permanent | what kind of data stored in
+                - The Young Generation is where all new objects are allocated and aged. When the young generation fills up, this causes a minor garbage collection. Minor collections can be optimized assuming a high object mortality rate. A young generation full of dead objects is collected very quickly. Some surviving objects are aged and eventually move to the old generation.
+                - The Old Generation is used to store long surviving objects. Typically, a threshold is set for young generation object and when that age is met, the object gets moved to the old generation. Eventually the old generation needs to be collected. This event is called a major garbage collection.
+                - The Permanent generation contains metadata required by the JVM to describe the classes and methods used in the application. The permanent generation is populated by the JVM at runtime based on classes in use by the application. In addition, Java SE library classes and methods may be stored here.
+        - stop the world event
+            - All minor garbage collections are "Stop the World" events. This means that all application threads are stopped until the operation completes. 
+        - minor GC,majorGC | what is it  
+            - The Young Generation is where all new objects are allocated and aged. When the young generation fills up, this causes a minor garbage collection. Minor collections can be optimized assuming a high object mortality rate. A young generation full of dead objects is collected very quickly. Some surviving objects are aged and eventually move to the old generation.
+            - Major garbage collection are also Stop the World events. Often a major collection is much slower because it involves all live objects. 
+- ### keyword 
+    - 53 keywords
+        - reversed true, false, null
+        - Reserved words for data types:
+            - byte,short,int,long,float,double,char,boolean
+        - Reserved words for flow control
+            - if ,else,switch ,case ,default ,for ,do ,while ,break ,continue,return
+        - Keywords for modifiers:
+            - public ,private ,protected,static,final ,abstract ,synchronized ,native ,strictfp(1.2 version) transient,volatile
+        - keywords for exception handling:
+            - try,catch,finally ,throw,throws,assert(1.4 version)
+        - Class related keywords:
+            - class,package,import,extends,implements,interface
+        - Object related keywords:
+            - new,instanceof ,super ,this,
+    - The continue statement in Java is used to skip the current iteration of a loop. 
+    - final finally finalize()
+        - final variable 
+            - to create constant variable
+            - must be initialized
+        - final method -> can’t be overridden
+        - final class -> cannot be inherited
+        - final is the keyword and access modifier which is used to apply restrictions on a class, method, or variable. finally is the block in Java Exception Handling to execute the important code whether the exception occurs or not. finalize is the method in Java which is used to perform clean up processing just before object is garbage collected.
+    - default 
+        - default allows the interfaces to have methods with implementation without affecting the classes that implement the interface. 
+    - volatile
+        - processors tend to queue those writes in a special write buffer. After a while, they will apply those writes to main memory all at once. This way, we communicate with runtime and processor to not reorder any instruction involving the volatile variable. Also, processors understand that they should flush any updates to these variables right away.
+        - It is also used to make classes thread safe, any write to a volatile field happens before every subsequent read of the same field.
+    - synchronized is only one thread can access the resource at a given point in time. 
+    - `assert Expression1` ;
+        - where Expression1 is a boolean expression. When the system runs the assertion, it evaluates Expression1 and if it is false throws an AssertionError 
+    - static/final var/method/class
+        - class level
+    - implements/extends
+    - immutable class
+        - final class
+        - private final field
+        - no setter
+        - return deep copy of the collections for getter
+    - throw throws
+        - thow in throw new exception
+        - throws is a keyword in Java which is used in the signature of method to indicate that this method might throw one of the listed type exceptions.
+
+- ### OOP
+    - abstraction
+        - *only the essential details are displayed to the user.*
+        - how to achieve : using abstract class, interface
+        - interface: what ablity u have
+        - abstract class: who u are
+            - Type of methods: Interface can have only abstract methods. An abstract class can have abstract and non-abstract methods. From Java 8, it can have default and static methods also.
+            - Final Variables: Variables declared in a Java interface are by default final. An abstract class may contain non-final variables.
+            - Type of variables: Abstract class can have final, non-final, static and non-static variables. The interface has only static and final variables.
+    - encapulation
+        - *It is defined as the wrapping up of data under a single unit. It is the mechanism that binds together code and the data it manipulates.*
+        - declare var private, can not access var directory
+        - use getter 
+    - inheritance
+        - *one class is allow to inherit the features(fields and methods) of another class.*
+        - 1 extends
+        - implement
+    - polymophsim
+        - *differentiate between entities with the same name efficiently.* 
+        - complie time overload
+            -  allows different methods to have the same name, but different signatures where the signature can differ by the number of input parameters or type of input parameters or both.
+        - runtime  override
+    - public protected, default, private scope
+    
+        ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2jzteGQjIjNDrnXkSzJCJk2lrzGRXRc30SA&usqp=CAU)
+- ### Exception
+    - checked/ unchecked(NullPointer, IndexOutofBound) | example
+        - Checked Exception: Has to be try-catched or decleared using throws keyword on method.
+            - classNotFountException, IOException, SQLException
+        - UnChecked Exception: Don't need to be try-catched or decleared.
+            - ArrayStoreException, NullPointException, ArrayIndexOutOfBoundException
+    - exception/ error
+        - Error: An Error indicates serious problem that a reasonable application should not try to catch. (VM error, assertion error)
+        - Exception: Exception indicates conditions that a reasonable application might try to catch.
+    - try with resource
+        - (implement autocloseable interface, ovveride close method)
+- ### Generics
+    - what is / how do we use/ Why?
+        - Generics mean parameterized types. The idea is to allow type (Integer, String, … etc, and user-defined types) to be a parameter to methods, classes, and interfaces. Using Generics, it is possible to create classes that work with different data types. 
+        - Generic methods have a type parameter (the diamond operator enclosing the type) before the return type of the method declaration.
+        - why
+            - easier and less error- prone
+            - enforce type correctness at compile time
+            - without causing any extra overhead to your application
+    - advantage/ disadvantage
+        - To achieve compile-time checking.
+        - To avoid ClassCastException error.
+        - To achieve code reusability. We can write a method/class/interface once and use it for any type we want.
+        - An object is the superclass of all other classes and Object reference can refer to any type of object. These features lack type safety. Generics adds that type of safety feature.
+        - Cannot instantiate Generic types with primitive types.
+        - Cannot create instances of type parameters.
+        - Cannot declare static fields whose types are type parameters.
+    - difference (E,?)
+        - <T extends E>
+            - we can specify that a method accepts a type and all its subclasses (upper bound) or a type and all its superclasses (lower bound).
+        - <? extends E>
+            - We know that Object is the supertype of all Java classes. However, a collection of Object is not the supertype of any collection. the <u>bounded wildcard</u> can do the magic. This is called an upper-bounded wildcard, where type Building is the upper bound.
+    - type erasure
+        - to ensure that generics won't cause overhead at runtime, the compiler applies a process called type erasure on generics at compile time.
+        - Type erasure removes all type parameters and replaces them with their bounds or with Object if the type parameter is unbounded.
+        - List<int> wrong?
+        - To understand why primitive data types don't work, let's remember that generics are a compile-time feature, meaning the type parameter is erased and all generic types are implemented as type Object.
+- ### IO Stream
+    - A stream is just a continuous flow of data. 
+    - Byte/ Character Stream
+        - Byte stream performs input and output of 8-bit bytes. 
+        - All byte stream classes are descended from InputStream and OutputStream.
+        - Character stream is 2 bytes stream used for character transfer. 
+        - All character stream classes are descended from Reader and Writer.
+    - Input/Output (Byte)
+    - Reader/Writer (Character)
+    - File (Manipulate file system)
+        - give you access to underlying file system
+- Serialization/Deserialization
+    - Serialization is the conversion of the state of an object into a byte stream; deserialization does the opposite.
+    - implement serializable interface
+    - transient
+        - transient is a variables modifier used in serialization. At the time of serialization, if we don’t want to save value of a particular variable in a file, then we use transient keyword. When JVM comes across transient keyword, it ignores original value of the variable and save default value of that variable data type.
+- ### Java8 feature
+    - lamda |  why should use 
+        - all the var created by lamda is immutable, thread-safe
+        - functional programming
+        - less code
+    - functional interface
+        - @
+        - Predicate -> test
+        - Function -> apply
+        - Consumer -> accept
+        - Supplier -> get
+    - Optional| what api
+        - orelse, ofNullable, of, 
+            - However, the argument passed to the of() method can't be null.
+            - But in case we expect some null values, we can use the ofNullable() method
+            - The orElse() method is used to retrieve the value wrapped inside an Optional instance. It takes one parameter, which acts as a default value. 
+        - why
+            - prevent NPE(NullPointerException)
+    - Stream
+        - intermediate (return stream)
+        - terminal(return non-stream)
+        - api
+            - map, flatmap
+                - The map() method wraps the underlying sequence in a Stream instance, whereas the flatMap() method allows avoiding nested Stream<Stream<R>> structure.
+            - transfer list to map
+                - ```
+                    lt.stream()
+                      .collect(
+                          Collectors
+                              .toMap(
+                                  Student::getId,
+                                  Student::getName,
+                                  (x, y)
+                                      -> x + ", " + y,
+                                  LinkedHashMap::new));
+                    ```
+    - method reference
+        - defination/usage
+        -  You use lambda expressions to create anonymous methods. Sometimes, however, a lambda expression does nothing but call an existing method. In those cases, it's often clearer to refer to the existing method by name. Method references enable you to do this; they are compact, easy-to-read lambda expressions for methods that already have a name.
+        
+- ### Multithread
+    - process/thread
+        - process
+            -independent memory space, stack, heap, and OS resources
+        - Thread 
+            - shared memory space 
+            - private stack, program counter, register
+        > - When compared to processes, Java Threads are more lightweight; it takes less time and resources to create a thread. 
+        > - Threads share the data and code of their parent process.
+        > - Thread communication is simpler than process communication.
+        > - Context switching between threads is usually cheaper than switching between processes.
+    - state
+        - new,runnable,waiting,timed waiting, blocked, terminated
+            - <u>new</u>: thread created, not yet start
+            - <u>runnable</u> executing in JVM
+            - <u>blocked</u> wait for a monitor lock to entry synchronized block or method
+            - <u>waiting</u> 
+                - Object.wait with no timeout
+                - Thread.join with no timeout
+                - LockSupport.park
+            - <u>timed_waiting</u>
+                - Thread.sleep
+                - Object.wait with timeout
+                - Thread.join with timeout
+                - LockSupport.parkNanos
+                - LockSupport.parkUntil
+            - <u>terminated</u> thread has completed/ some exception
+![](https://media.geeksforgeeks.org/wp-content/uploads/threadLifeCycle.jpg)
+    - how to create thread
+        - extends Thread
+        - implements runnable
+        - implement callable
+        - thread pool
+    - runnable / callable
+        - no return / has
+        - no exception / has
+        - run() / call();
+    - thread pool
+        - A thread pool reuses previously created threads to execute current tasks and offers a solution to the problem of thread cycle overhead and resource thrashing.
+        - customerized threadPoolExecutor(class)/ExecutorService(interface)
+            - corePoolSize: the number of thread in the pool
+            - maximumPoolSize: max number in the thread
+            - keepAliveTime: wait for new task before terminated
+            - unit: time unit for keepAliveTime
+            - workQueue: cache request
+            - threadFactory: create thread  
+            - handler: reject policy
+                - AbortPolicy(default)
+                - CallerRunPolicy
+                - DiscardPolicy
+                - DiscardOldestPolicy
+        - inbuild(4)
+            - single, fixed size, cache, schedule
+        -  ``` java
+                ExecutorService threadPool1 = Executors.newFixedThreadPool(5); // core == 5, max == 5
+                ExecutorService threadPool2 = Executors.newSingleThreadExecutor(); // core 1, max 1
+                ExecutorService threadPool3 = Executors.newCachedThreadPool(); // core 0, max = Integer.MAX_VALUE;
+                ExecutorService threadPool4 = Executors.newScheduledThreadPool(3); // Creates a thread pool that can schedule commands to run after a given delay, or to execute periodically
+            ```
+        - completablefuture vs future
+            - future provides an isDone() method to check whether the computation is done or not, and a get() method to retrieve the result of the computation when it is done. But if there comes a scenario where you need to complete it manually, Future does not provide any means to do so.
+            - While using Future, we do not get notified when it is complete neither does it provides us a callable method which will automatically be called when the result is available but CompletableFuture provides us with a lot of callable methods which can be used as per our use case.
+                - runAsync() supplyAsync() thenApply() thenAccept()
+
+- ### Lock
+    - sychronized
+        - static/ non-static difference
+        - When synchronizing a non static method, the monitor belongs to the instance. When synchronizing on a static method , the monitor belongs to the class. In case of non-static synchronized method memory is allocated multiple time whenever method is calling. But memory for static method is allocated only once at the time of class loading. That means while execution of a static method the whole class is blocked. So other static synchronized methods are also blocked. If one thread is executing a static synchronized method, all other threads trying to execute any static synchronized methods will be blocked.
+    - Lock interface
+        - reentrant lock
+    - ReadWrite lock
+    - JUC() semaphore
+    - Consumer/Supplier model
+        - A producer cannot put something in the buffer until the buffer has space available. A consumer cannot take something out of the buffer until the producer has written to the buffer.
+- ### Enum
+    - constant value
+    - ordinal index
+    - method
+    
+
+
+
+        
+

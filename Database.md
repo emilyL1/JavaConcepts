@@ -1,0 +1,146 @@
+## Database Details
+- ### DBMS/SQL/database
+    - database management system (DBMS):  MySQL, Oracle, PostgreSQL, SQL server
+    - different program to insert/delete/update/query
+    - SQL: Structured Query Language
+- ### file system vs database
+    - manage or organize the files in storage medium /manage the database
+    - redundant data/no redundant
+    - no efficient query processing /efficient
+    - less data consistency / consistency
+    - less security / more security
+    - less expensive / cost high
+- ### normalization
+    - to eliminate redundant data and ensure data is stored logically
+    - 1: No repeating groups
+    - 2: Eliminate redundant data
+    - 3: Eliminate data not dependent on key, has no transitive functional dependencies
+- ### major categories of no-sql and name some examples for each of them
+    - document: mongoDB, couchDB
+    - key-value: redis, riak
+    - graph: Neo4j, GraphDB
+    - columnar: cassandra, Hbase
+- ### CAP
+    - C: Consistency
+        - all clients always have the same view of the data
+    - A: Availability
+        - each client can always read and write
+    - P: Partition Tolerance
+        - the system works well despite physical network partitions
+    - which belongs
+        - CP: MongoDB, Hbase, BigTable, Redis …
+        - AP: Dynamo, Cassandra, SimpleDB, CouchDB
+- ### sharding repilca
+    - distribute a single logical database across a cluster of machine
+        - cannot store too much data
+        - data is too much, can not search in short time
+    - redudancy, failover
+- ### MongoDB
+    - achitechure
+        - Mongod: database instance
+        - Mongos: sharding processes
+            - analogous to a database router
+            - process all the request based on the info from config servers
+            - decide how many, which mongods should receive the query
+        - Mongo: interactive shell
+    - functionality
+        - dynamic schema
+        - document based database
+        - secondary indexes
+        - primary-second node with automated failover
+        - built in horizontal scaling via automated ranged based partitioning of data(sharding)
+        - follows CP
+- ### Redis (what is supported, how to use as cache)
+    - data structure
+        - String, List, Set, Hashes, Sorted Set
+    - persistence mechncham
+        - allows for persistence to disk
+        - RDB(redis database): the RDB persistence performs point-in-time snapshots of the database at specific intervals
+        - AOF (append only file): the AOF persistence logs every write operation received by the server, what will be played again at server startup, reconstructing the original dataset.
+    - usage
+        - cache
+            - cache hit
+            - cache miss
+                - A cache miss occurs when the application attempts to retrieve information from cache memory, but the given item is not actually present in the cache. 
+                - When the cache is full, LRU (“least recently used”) caches evict information that users accessed in the most distant past. LFU (“least frequently used”) caches evict information that users access the least.
+        - distributed lock
+        - message queue (not recommended)
+        - store configuration information
+- ### sql | no-sql
+    - relational database | non-relational database
+    - pre-defined schema | dynamic schema
+    - vertical scaling(empower the computer) | horizontal scaling(more computer)
+    - ACID | CAP
+    - not suited for hierarchical data store | suited for hierarchical data store
+- ### index
+    - indexing is a way to optimize the performance of database by minimizing the number of the disk access required when a query is processed
+    - cluster index
+        - defines the order in which data is physically stored
+        - only one clustered index per table
+    - non cluster
+        - as many as non-cluster index 
+        - doesn’t sort the physical data inside the table
+    - data structure
+        - B+ tree (default)
+            - B Tree is known as a self-balancing tree as its nodes are sorted in the inorder traversal.
+            - B+ tree eliminates the drawback B-tree used for indexing by storing data pointers only at the leaf nodes of the tree. 
+        - bitmap
+        - hashtable
+        - r tree
+- ### sql/application tuning
+    - SQL tuning
+        - using execution plan to identify the cause of slowness
+        - try to reduce joins, remove unused join and join conditions
+        - use the index to improve the performance
+        - union all instead of union(de-duplicate)
+        - limit 
+        - view or stored procedure
+    - application tuning
+        - check the db query - do the sql tuning
+        - DB connection usage  -> connection pool
+        - do JVM tuning -> Jstack, JMap, JConsole
+        - server side: CPU, Memory usage by using commands like top, ps
+        - code review 
+        - check networking, firewall, load balancer
+    - view vs store procedure
+        - 
+    - view vs materilized
+- ### Transaction
+    - A transaction is an action, or a series of actions, carried out by a single user or an application program
+    - ACID
+        - Atomicity
+            - all transactions are atomic
+            - can’t be executed partially
+            - commit or rollback
+        - Consistency
+            - transactions take the database from one consistent state to another state
+        - Isolation
+            - a transaction is not visible to other transactions until it completes
+        - Durability
+            - once a transaction has completed, its changes are made permanent
+- ### Concurrency
+    - dirty read, unrepeadable read, phantom read
+        - read uncommitted data from another transaction
+        - read committed data from an update query form another transaction
+        - read committed data from an insert or delete query from another transaction
+    -lock
+        - before update, add write lock -> unrepeatable read
+        - 1 + before read, add read lock, free after read -> dirty read
+        - 1 + before read, add read lock, free after all -> phantom read
+    - isolation
+- ### Lock
+    - binary lock
+    - shared lock | exclusive lock
+        - shared lock: read lock, others can read, and add shared lock
+        - exclusive lock: write lock, others can't read
+    - optimistic/pesimistic
+        - Optimistic locking is when you check if the record was updated by someone else before you commit the transaction. Pessimistic locking is when you take an exclusive lock so that no one else can start modifying the record.
+        - more read / more write
+    - deadlock | what, how to detect
+        - wait for graph
+- ### Distributed Transaction
+    - 2PC
+        - two phase commit
+    - SAGA
+        - A saga pattern is a sequence of local transactions where each transaction updates data within a single service. The first transaction in a saga is initiated by an external request corresponding to the system operation, and then each subsequent step is triggered by the completion of the previous one.
+- SQL
