@@ -14,6 +14,9 @@ This repository is for summarizing what I have learned so far.
 - [Security](./Security.md)
 - [Kafka](./Kafka.md)
 - [SDLC](./SDLC.md)
+- Cloud
+    - [CICD](./CICD.md)
+    - [AWS](./AWS.md)
 
 
 ### Daily Checklist
