@@ -17,6 +17,7 @@ This repository is for summarizing what I have learned so far.
 - Cloud
     - [CICD](./CICD.md)
     - [AWS](./AWS.md)
+    - [K8S](./K8S.md)
 
 
 ### Daily Checklist

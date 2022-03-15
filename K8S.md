@@ -1,0 +1,102 @@
+# K8S
+## docker
+- container
+    - docker image readonly
+    - container vs VM
+        - containers temporary process
+        - stand-in for real hardware
+    - container do not run on docker, docker is one way to manage containers
+    - docker
+        - manage the configuration of linux kernel namespace (cgroups) 
+        - runtime is linux, not docker
+    - makes container possible 
+        - cgroup(control group) 
+            - consume resources, how much u can see
+        - namespaces(pid, net, mnt(Mount), uts, ipc, user) what u can see
+        - Namespace gives the isolation for the container with the underline host where Cgroup gives the ability to allocate things to those containers. 
+- docker file
+    - content
+        - FROM: base image
+        - ADD: add file
+        - LABEL: metadata
+        - WORKDIR
+        - ENV: environment
+        - EXPOSE: listen on port/ does not publish
+        - RUN: excute in a new layer, result will be in the next step
+        - CMD vs ENTRYPOINT:
+            - define argument
+            - using container as executable
+- command
+    - `docker run -p 8080:8080` machine: container
+    - `docker ps` show process
+    - `docker rmi` remove images
+    - `docker exec -it [id of container] /bin/bash` go into the container, can not change it
+    - `docker inspect` provide detailed information, Json array 
+## kubernetes
+- manage container(container orchestration)
+    - master node (control plane)
+        - controls and manages the whole Kubernetes system
+        - Kubernetes API Server
+            - you and the other Control Plane components communicate with
+        - Scheduler
+            - <u>assigns a worker node</u> to each deployable component of your application
+        - Controller Manager
+            - performs <u>cluster-level functions</u>, such as replicating components, keeping track of worker nodes, handling node failures
+        - etcd
+            - a reliable distributed<u> data store</u> that persistently stores the cluster configuration.
+    - worker node
+        - Docker, rkt, or another container runtime, which runs your containers
+        - Kubelet
+            - talks to the API server and manages containers on its node
+        - Kubernetes Service Proxy (kube-proxy)
+            - load-balances network traffic between application components
+- pod
+    - basic building block
+    - node- pod - container
+    - has more than 1 container, but must run on single server
+    - in differnet namespace can connect
+    - why?
+        - run closely related processes together and provide them with (almost) the same environment 
+    - Keeping Pods Healthy
+        - you want your deployments to stay up and running automatically and remain healthy without any manual intervention. 
+        - Liveness Probes
+            - run by kubelet
+            - HTTP get
+            - TCP connection
+            - check exit code 
+        - resource 
+            - ReplicationController 
+                - constantly monitors the list of running pods and makes sure the actual number of pods of a “type” always matches the desired number. 
+                - label selector, replica count, pod template
+            - ReplicaSets
+                - also allows matching pods that lack a certain label or pods that include a certain label key
+            - DaemonSets
+                -  want a pod to run on each and every node in the cluster. 
+            - Job Resource
+                - after its process terminates, it should not be restarted again. 
+    - Services
+        - Enabling clients to discover and talk to pods
+        - why not specifying the exact IP?
+            - Pods are ephemeral—They may come and go at any time
+            - Kubernetes assigns an IP address to a pod after the pod has been scheduled
+            - Horizontal scaling means multiple pods may provide the same service
+        - a resource you create to make a single, constant point of entry to a group of pods providing the same service. 
+    - Readiness Probes
+        - Liveness probes keep pods healthy by killing off unhealthy containers and replacing them with new, healthy ones.
+        - Readiness probes make sure that only pods that are ready to serve requests receive them. 
+    - Volumes
+        - In certain scenarios you want the new container to continue where the last one finished, such as when restarting a process on a physical machine. You may not need (or want) the whole filesystem to be persisted, but you do want to preserve the directories that hold actual data. 
+        - emptyDir—A simple empty directory used for storing transient data.
+        - hostPath—Used for mounting directories from the worker node’s filesystem into the pod.
+        - configMap, secret, downwardAPI—Special types of volumes used to expose certain Kubernetes resources and cluster information to the pod.
+            - ConfigMaps
+                - keep the config options that vary between environments
+            - Secret
+                - Secrets are stored in encrypted on the master node, more specifically in etcd.
+    - StatefulSetsvs. ReplicaSet
+        - the new instance needs to get the same name, network identity, and state as the one it’s replacing.
+        - stateless 
+### command line
+- `kops` create cluseter
+- `kubectl` command line interface
+
