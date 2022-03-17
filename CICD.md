@@ -9,5 +9,6 @@
 - CD scenerio
 ![](https://www.jenkins.io/doc/book/resources/pipeline/realworld-pipeline-flow.png)
 
+- [pipeline](https://www.jenkins.io/doc/tutorials/#pipeline/)
 
  
